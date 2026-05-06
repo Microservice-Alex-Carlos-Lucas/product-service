@@ -23,5 +23,14 @@ pipeline {
                 }
             }
         }
+        stage('Deploy to EKS') {
+            steps {
+                sh '''
+                    aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
+                    kubectl set image deployment/${SERVICE} ${SERVICE}=${NAME}:${BUILD_ID}
+                    kubectl rollout status deployment/${SERVICE} --timeout=120s
+                '''
+            }
+        }
     }
 }

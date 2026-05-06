@@ -28,10 +28,10 @@ consome via OpenFeign para resolver os itens de um pedido.
 | Atividade | Status |
 |---|---|
 | CRUD endpoints | ✅ |
-| Bottleneck 1 — Cache Redis | ⏳ ([spec](bottlenecks.md)) |
-| Bottleneck 2 — Métrica nativa de cache | ⏳ ([spec](bottlenecks.md)) |
-| k8s manifests | ✅ (`k8s/`) |
-| Jenkinsfile | ✅ |
+| Bottleneck 1 — Cache Redis (3× speedup medido) | ✅ ([detalhes](bottlenecks.md)) |
+| Bottleneck 2 — Métrica nativa de cache | ✅ ([detalhes](bottlenecks.md)) |
+| k8s manifests + HPA | ✅ (`k8s/`) |
+| Jenkinsfile com Build + Push + Deploy to EKS | ✅ |
 
 ## Repositórios do grupo
 

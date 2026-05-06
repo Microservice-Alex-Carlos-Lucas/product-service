@@ -51,3 +51,13 @@ spec:
                 secretKeyRef:
                   name: product-secrets
                   key: DATABASE_PASSWORD
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: product-configmap
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: product-configmap
+                  key: REDIS_PORT

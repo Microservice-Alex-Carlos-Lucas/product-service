@@ -25,8 +25,19 @@ spring:
       hibernate:
         default_schema: products
 
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+
+  cache:
+    type: redis
+
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus
+        include: health,info,prometheus,caches
+  metrics:
+    cache:
+      instrument: true
