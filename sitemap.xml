@@ -2,18 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://microservice-alex-carlos-lucas.github.io/product-service/</loc>
-         <lastmod>2026-05-15</lastmod>
+         <lastmod>2026-05-20</lastmod>
+    </url>
+    <url>
+         <loc>https://microservice-alex-carlos-lucas.github.io/product-service/api/</loc>
+         <lastmod>2026-05-20</lastmod>
+    </url>
+    <url>
+         <loc>https://microservice-alex-carlos-lucas.github.io/product-service/architecture/</loc>
+         <lastmod>2026-05-20</lastmod>
     </url>
     <url>
          <loc>https://microservice-alex-carlos-lucas.github.io/product-service/bottlenecks/</loc>
-         <lastmod>2026-05-15</lastmod>
+         <lastmod>2026-05-20</lastmod>
     </url>
     <url>
-         <loc>https://microservice-alex-carlos-lucas.github.io/product-service/endpoints/</loc>
-         <lastmod>2026-05-15</lastmod>
-    </url>
-    <url>
-         <loc>https://microservice-alex-carlos-lucas.github.io/product-service/repositorios/</loc>
-         <lastmod>2026-05-15</lastmod>
+         <loc>https://microservice-alex-carlos-lucas.github.io/product-service/development/</loc>
+         <lastmod>2026-05-20</lastmod>
     </url>
 </urlset>
