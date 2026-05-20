@@ -1,41 +1,81 @@
 # Product API
 
-**Aluno:** Carlos
-**Grupo:** Alex Chequer · Carlos · Lucas
-**Disciplina:** Plataformas, Microserviços, DevOps e APIs — Insper 2026.1
+**Aluno:** Carlos Hernani
+**Grupo:** Alex Chequer, Carlos Hernani, Lucas Ikawa  
+**Disciplina:** Plataformas, Microserviços e APIs — Insper 2026.1  
+**Instrutor:** Humberto Sandmann
 
 ---
 
-## Sobre o serviço
+## Sobre o projeto
 
-Microsserviço de catálogo: cria, lê, atualiza e remove produtos. Cada
-produto tem `id`, `name`, `price` e `currency`. O `order-service` o
-consome via OpenFeign para resolver os itens de um pedido.
+O projeto é uma aplicação web que permite aos usuários comprar e vender produtos em diferentes moedas. Cada membro do grupo implementa ao menos um microserviço. Este repositório contém a **Product API**, responsável pelo catálogo de produtos da loja — criação, listagem (com busca por nome), consulta e remoção. O `order-service` a consome via OpenFeign para resolver os itens de um pedido.
 
-## Stack
+## Entregas
 
-| Item | Detalhe |
-|---|---|
-| Linguagem | Java 25 |
-| Framework | Spring Boot 4.0.3 |
-| Banco | PostgreSQL (schema `products`) — RDS gerenciado em produção |
-| Migrations | Flyway |
-| Cache | Redis (implementado — ver [Bottlenecks](bottlenecks.md)) |
-| Observabilidade | Spring Actuator + Micrometer Prometheus |
-| Orquestração | Kubernetes (EKS), HPA target 50% CPU (1-5 réplicas) |
-| CI/CD | Jenkins — Build → Push → Deploy to EKS |
+| Atividade | Status | Repositório |
+|-----------|--------|-------------|
+| Product API | ✅ Concluído | [Microservice-Alex-Carlos-Lucas/product-service](https://github.com/Microservice-Alex-Carlos-Lucas/product-service) |
+| Bottleneck 1 — Caching | ✅ Documentado | [Bottlenecks](bottlenecks.md) |
+| Bottleneck 2 — Observabilidade | ✅ Documentado | [Bottlenecks](bottlenecks.md) |
+| Bottlenecks (medidos) | ✅ 3× speedup com Redis cache | [Bottlenecks](bottlenecks.md) |
+| Deploy em EKS + HPA | ✅ Cluster `store-cluster` (us-east-1) | [Architecture](architecture.md) |
+| Pipeline Jenkins (Build → Push → Deploy) | ✅ | [Development](development.md) |
 
-## Status de entrega
+## Repositórios
 
-| Atividade | Status |
-|---|---|
-| CRUD endpoints | ✅ |
-| Bottleneck 1 — Cache Redis (3× speedup medido) | ✅ ([detalhes](bottlenecks.md)) |
-| Bottleneck 2 — Métrica nativa de cache | ✅ ([detalhes](bottlenecks.md)) |
-| k8s manifests + HPA | ✅ (`k8s/`) |
-| Jenkinsfile com Build + Push + Deploy to EKS | ✅ |
-| Deploy em cluster EKS real | ✅ (cluster `store-cluster` em `us-east-1`) |
+| Serviço | Repositório |
+|---------|-------------|
+| Product API (este) | [Microservice-Alex-Carlos-Lucas/product-service](https://github.com/Microservice-Alex-Carlos-Lucas/product-service) |
+| Plataforma (raiz) | [Microservice-Alex-Carlos-Lucas/microservices](https://github.com/Microservice-Alex-Carlos-Lucas/microservices) |
+| Exchange API | [Microservice-Alex-Carlos-Lucas/exchange](https://github.com/Microservice-Alex-Carlos-Lucas/exchange) |
+| Order API | [Microservice-Alex-Carlos-Lucas/order-service](https://github.com/Microservice-Alex-Carlos-Lucas/order-service) |
 
-## Repositórios do grupo
+## Arquitetura geral
 
-Ver [Repositórios](repositorios.md).
+```mermaid
+graph LR
+    internet([Internet]) -->|request| gateway
+
+    subgraph trusted[Trusted Layer]
+        gateway --> auth
+        gateway --> account
+        gateway --> order
+        gateway --> product
+        gateway --> exchange
+        account --> db[(Database)]
+        order --> db
+        product --> productdb[(PostgreSQL\nschema: products)]
+        product --> redis[(Redis\nTTL 60s)]
+    end
+
+    order -->|OpenFeign\nGET /products/id| product
+```
+
+## Diagrama de sequência — Product API
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Gateway
+    participant Auth
+    participant Product
+    participant Redis
+    participant Postgres
+
+    User->>Gateway: GET /products/{id} (cookie JWT)
+    Gateway->>Auth: POST /auth/solve
+    Auth-->>Gateway: { idAccount }
+    Gateway->>Product: GET /products/{id} (header: id-account)
+    Product->>Redis: GET products::products::{id}
+    alt cache miss
+        Redis-->>Product: (nil)
+        Product->>Postgres: SELECT * FROM products.product WHERE id = ?
+        Postgres-->>Product: row
+        Product->>Redis: SETEX products::products::{id} 60 ...
+    else cache hit
+        Redis-->>Product: { id, name, price, unit }
+    end
+    Product-->>Gateway: 200 { id, name, price, unit }
+    Gateway-->>User: 200 OK
+```

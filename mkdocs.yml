@@ -108,6 +108,7 @@ extra_javascript:
 
 nav:
   - Home: index.md
-  - Endpoints: endpoints.md
+  - API Reference: api.md
+  - Architecture: architecture.md
   - Bottlenecks: bottlenecks.md
-  - Repositórios: repositorios.md
+  - Development: development.md
